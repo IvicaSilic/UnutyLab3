@@ -17,6 +17,7 @@ public class InteractableObject : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E) && !isActive)
         {
+            Debug.Log("E pressed!");
             StartCoroutine(ActivateEffect());
         }
     }
@@ -26,8 +27,9 @@ public class InteractableObject : MonoBehaviour
         isActive = true;
         ShowStatus("Mehanizam aktiviran!");
 
-        // Pokreni sve objekte s tagom "Interactable"
         GameObject[] objects = GameObject.FindGameObjectsWithTag("Interactable");
+        Debug.Log("Pronadeno objekata: " + objects.Length);
+
         foreach (GameObject obj in objects)
         {
             Rigidbody rb = obj.GetComponent<Rigidbody>();
@@ -36,7 +38,6 @@ public class InteractableObject : MonoBehaviour
         }
 
         yield return new WaitForSeconds(effectDuration);
-
         ShowStatus("");
         isActive = false;
     }
