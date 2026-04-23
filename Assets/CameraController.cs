@@ -21,7 +21,6 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         playerTransform = transform.parent;
-        weaponObject = playerTransform.Find("Cube 7").gameObject;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
@@ -52,11 +51,9 @@ public class CameraController : MonoBehaviour
             {
                 transform.localPosition = new Vector3(0f, 0.8f, 0f);
                 transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
-                weaponObject.SetActive(true);
             }
             else
             {
-                weaponObject.SetActive(false);
             }
         }
     }
