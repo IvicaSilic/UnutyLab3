@@ -69,6 +69,14 @@ public class PlayerController : MonoBehaviour
         move = move.normalized * speed;
 
         rb.linearVelocity = new Vector3(move.x, rb.linearVelocity.y, move.z);
+
+        // ADD THIS - clamp horizontal speed so it never exceeds current speed
+        Vector3 horizontal = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
+        if (horizontal.magnitude > speed)
+        {
+            horizontal = horizontal.normalized * speed;
+            rb.linearVelocity = new Vector3(horizontal.x, rb.linearVelocity.y, horizontal.z);
+        }
     }
 
     void HandleJump()

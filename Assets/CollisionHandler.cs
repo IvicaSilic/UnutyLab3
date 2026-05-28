@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +15,7 @@ public class CollisionHandler : MonoBehaviour
     public TextMeshProUGUI statusText;
 
     private PlayerController playerController;
+    private Coroutine speedRoutine;
 
     void Start()
     {
@@ -22,7 +23,6 @@ public class CollisionHandler : MonoBehaviour
         UpdateScoreUI();
     }
 
-    // Sudari s objektima
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.name == "Coin")
@@ -37,24 +37,40 @@ public class CollisionHandler : MonoBehaviour
             score -= 5;
             UpdateScoreUI();
             ShowStatus("Spike! -5 bodova");
-            StartCoroutine(SpeedPenalty());
+            if (speedRoutine != null) StopCoroutine(speedRoutine);
+            speedRoutine = StartCoroutine(SpeedPenalty());
         }
     }
 
-    // Trigger zone
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log("PROŠAO KROZ: " + other.gameObject.name + " | Tag: " + other.gameObject.tag);
+
         if (other.gameObject.name == "SpeedBoostZone")
         {
-            StartCoroutine(SpeedBoost());
+            Debug.Log("!!! AKTIVIRAN SPEED BOOST !!!");
+            if (speedRoutine != null) StopCoroutine(speedRoutine);
+            speedRoutine = StartCoroutine(SpeedBoost());
         }
-        else if (other.gameObject.name == "SlowZone")
+        else if (other.gameObject.name == "SlowBoostZone") // FIXED NAME
         {
-            StartCoroutine(SlowDown());
+            if (speedRoutine != null) StopCoroutine(speedRoutine);
+            speedRoutine = StartCoroutine(SlowDown());
         }
     }
 
-    // Coroutines
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.name == "SpeedBoostZone" || other.gameObject.name == "SlowBoostZone")
+        {
+            if (speedRoutine != null) StopCoroutine(speedRoutine);
+            playerController.walkSpeed = normalSpeed;
+            playerController.runSpeed = normalSpeed * 2f;
+            ShowStatus("Izašao iz zone");
+            StartCoroutine(ClearStatus());
+        }
+    }
+
     IEnumerator SpeedBoost()
     {
         ShowStatus("SPEED BOOST!");
@@ -82,6 +98,12 @@ public class CollisionHandler : MonoBehaviour
         playerController.walkSpeed = normalSpeed * 0.3f;
         yield return new WaitForSeconds(2f);
         playerController.walkSpeed = normalSpeed;
+    }
+
+    IEnumerator ClearStatus()
+    {
+        yield return new WaitForSeconds(1.5f);
+        ShowStatus("");
     }
 
     void UpdateScoreUI()
